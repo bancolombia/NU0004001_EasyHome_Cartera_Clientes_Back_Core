@@ -1,0 +1,96 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.1.RELEASE'
+        springCloudVersion = 'Greenwich.M1'
+    }
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://artifactory.apps.bancolombia.com:443/maven-bancolombia" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+plugins {
+    id "org.sonarqube" version "2.7"
+    id 'java-gradle-plugin'
+}
+dependencies{
+    compileOnly 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    implementation group: 'co.com.bancolombia', name: 'log-tecnico-vd', version: '1.0.3-SNAPSHOT'
+}
+apply from: './main.gradle'
+
+sonarqube{
+    properties {
+        property "sonar.sourceEncoding" , "UTF-8"
+    }
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "jacoco"
+    //Disable the test report for the individual test task
+    repositories {
+        maven { url 'https://artifactory.apps.bancolombia.com/maven-bancolombia' }
+    }
+    jacoco {
+        toolVersion = '0.8.5'
+    }
+}
+subprojects {
+    jacocoTestReport {
+        reports {
+            html.enabled = true
+            xml.enabled = true
+        }
+    }
+}
+
+task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn = subprojects.test
+    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(subprojects.sourceSets.main.output)
+    executionData = files(subprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+    }
+    onlyIf = {
+        true
+    }
+    doFirst {
+        executionData = files(executionData.findAll {
+            it.exists()
+        })
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'co/com/bancolombia/easyhome/clientes/core/loansMortgages/**')
+        })
+    }
+
+}
+group 'co.com.bancolombia.easyhome'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile){
+    options.encoding = 'UTF-8'
+}
+apply from: './main.gradle'

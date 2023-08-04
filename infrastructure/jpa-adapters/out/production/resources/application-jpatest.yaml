@@ -1,0 +1,6 @@
+
+databaseConfig:
+  driver: org.postgresql.Driver
+  connectionString: jdbc:postgresql://%s:%s/%s
+  secretName: clean-architecture
+  secretRegion: EasyHome-DB-Access

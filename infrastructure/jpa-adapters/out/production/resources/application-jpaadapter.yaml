@@ -1,0 +1,7 @@
+databaseConfig:
+  driver: org.postgresql.Driver
+  connectionString: jdbc:postgresql://%s:%s/%s?currentSchema=scheahom 
+  regionSecret: ${DB_SECRET_REGION:us-east-1}
+  nameSecret: ${DB_SECRET_NAME:easy-home-dev-secretrds-CNX}
+server:
+  port: 4006

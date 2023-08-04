@@ -1,0 +1,41 @@
+apply plugin: 'org.springframework.boot'
+
+
+group 'co.com.bancolombia.easyhome'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+buildscript {
+    configurations{
+        compile.exclude group: "org.springframework.boot", module:"spring-boot-starter-tomcat"
+    }
+}
+dependencies {
+    implementation project(':domain-model')
+    implementation project(':infrastructure-driven-adapters')
+    implementation project(':infrastructure-jpa-adapters')
+    implementation project(':infrastructure-consumer-adapters')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.apache.tomcat:tomcat-jdbc:7.0.28'
+    implementation 'org.apache.commons:commons-dbcp2:2.2.0'
+    implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    runtime('org.springframework.boot:spring-boot-devtools')
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-undertow', version: '2.1.1.RELEASE'
+    implementation group: 'co.com.bancolombia', name: 'log-tecnico-vd', version: '1.0.3-SNAPSHOT'
+    implementation(group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.9.0')
+
+}
+configurations{
+    compile.exclude group: "org.springframework.boot", module:"spring-boot-starter-tomcat"
+    all*.exclude module : 'spring-boot-starter-logging'
+}
+
+task explodedJar(type: Copy) {
+    with jar
+    into "${buildDir}/exploded"
+}
